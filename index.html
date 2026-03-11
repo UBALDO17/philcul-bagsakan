@@ -1,0 +1,1337 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PhilCul Bagsakan</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Nunito:wght@400;600;700;800&display=swap');
+
+  :root {
+    --sun: #FFD700;
+    --blue: #0038A8;
+    --red: #CE1126;
+    --white: #FAFAFA;
+    --dark: #0a0a1a;
+    --card: #ffffff;
+    --text: #1a1a2e;
+    --muted: #6b7280;
+    --correct: #16a34a;
+    --wrong: #dc2626;
+    --correct-bg: #dcfce7;
+    --wrong-bg: #fee2e2;
+    --shadow: 0 8px 32px rgba(0,56,168,0.15);
+  }
+
+  body.dark {
+    --card: #1e2a4a;
+    --text: #e8eaf6;
+    --muted: #9ca3af;
+    --white: #0d1b3e;
+    --correct-bg: #14532d;
+    --wrong-bg: #7f1d1d;
+    --shadow: 0 8px 32px rgba(0,0,0,0.4);
+  }
+
+  * { margin:0; padding:0; box-sizing:border-box; }
+
+  body {
+    font-family: 'Nunito', sans-serif;
+    background: var(--white);
+    min-height: 100vh;
+    transition: background 0.3s;
+  }
+
+  body:not(.dark) {
+    background: linear-gradient(135deg, #e8f0ff 0%, #fff5f5 50%, #fffbeb 100%);
+  }
+
+  body.dark {
+    background: linear-gradient(135deg, #0a0a1a 0%, #0d1b3e 100%);
+  }
+
+  /* ── HEADER ── */
+  .header {
+    background: linear-gradient(135deg, var(--blue) 0%, #1a237e 100%);
+    color: white;
+    padding: 20px 24px;
+    position: relative;
+    box-shadow: 0 4px 20px rgba(0,56,168,0.4);
+  }
+
+  .header-top {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    margin-bottom: 6px;
+    position: relative;
+  }
+
+  .header h1 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 32px;
+    letter-spacing: 3px;
+    color: var(--sun);
+    text-shadow: 0 2px 8px rgba(0,0,0,0.3);
+  }
+
+  .header-sub {
+    text-align: center;
+    font-size: 12px;
+    opacity: 0.8;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    font-weight: 600;
+  }
+
+  .flag-stars {
+    display: flex;
+    gap: 3px;
+    font-size: 18px;
+  }
+
+  .back-btn {
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    background: rgba(255,255,255,0.15);
+    border: none;
+    color: white;
+    padding: 8px 14px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 18px;
+    font-family: 'Nunito', sans-serif;
+    font-weight: 700;
+    display: none;
+    transition: background 0.2s;
+  }
+  .back-btn:hover { background: rgba(255,255,255,0.25); }
+  .back-btn.show { display: flex; align-items: center; gap: 5px; }
+
+  .theme-btn {
+    position: absolute;
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    background: rgba(255,255,255,0.15);
+    border: none;
+    color: white;
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s;
+  }
+  .theme-btn:hover { background: rgba(255,255,255,0.25); }
+
+  /* ── PROGRESS ── */
+  .progress-wrap {
+    background: rgba(255,255,255,0.15);
+    border-radius: 10px;
+    padding: 12px 16px;
+    margin-top: 14px;
+    display: none;
+  }
+  .progress-bar {
+    background: rgba(255,255,255,0.2);
+    border-radius: 10px;
+    height: 12px;
+    overflow: hidden;
+  }
+  .progress-fill {
+    background: linear-gradient(90deg, var(--sun), #ff9800);
+    height: 100%;
+    border-radius: 10px;
+    transition: width 0.4s ease;
+  }
+  .progress-stats {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 8px;
+    font-size: 13px;
+    font-weight: 700;
+  }
+
+  /* ── CONTAINER ── */
+  .container {
+    max-width: 780px;
+    margin: 0 auto;
+    padding: 24px 16px;
+  }
+
+  /* ── START SCREEN ── */
+  .start-screen {
+    display: none;
+    text-align: center;
+    animation: fadeUp 0.5s ease;
+  }
+  .start-screen.active { display: block; }
+
+  .welcome-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: linear-gradient(135deg, var(--blue), #3f51b5);
+    color: white;
+    padding: 8px 20px;
+    border-radius: 50px;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    margin-bottom: 20px;
+    text-transform: uppercase;
+  }
+
+  .start-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 42px;
+    color: var(--text);
+    letter-spacing: 2px;
+    margin-bottom: 8px;
+  }
+
+  .start-desc {
+    color: var(--muted);
+    font-size: 15px;
+    margin-bottom: 32px;
+    max-width: 480px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .subject-card {
+    background: var(--card);
+    border-radius: 20px;
+    padding: 32px;
+    box-shadow: var(--shadow);
+    border: 3px solid transparent;
+    cursor: pointer;
+    transition: all 0.3s;
+    margin-bottom: 20px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .subject-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 5px;
+    background: linear-gradient(90deg, var(--blue), var(--red), var(--sun));
+  }
+
+  .subject-card:hover {
+    transform: translateY(-4px);
+    border-color: var(--blue);
+    box-shadow: 0 16px 48px rgba(0,56,168,0.2);
+  }
+
+  .subject-card.selected {
+    border-color: var(--correct);
+    box-shadow: 0 0 0 4px rgba(22,163,74,0.2);
+  }
+
+  .card-emoji { font-size: 48px; margin-bottom: 10px; }
+  .card-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 28px;
+    color: var(--text);
+    letter-spacing: 2px;
+  }
+  .card-sub { color: var(--muted); font-size: 14px; font-weight: 600; margin-top: 4px; }
+  .card-count {
+    display: inline-block;
+    background: linear-gradient(135deg, var(--blue), #3f51b5);
+    color: white;
+    padding: 4px 14px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 700;
+    margin-top: 10px;
+  }
+
+  .shuffle-toggle {
+    background: var(--card);
+    border: 2px solid #e5e7eb;
+    border-radius: 14px;
+    padding: 16px 20px;
+    cursor: pointer;
+    display: none;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 20px;
+    transition: all 0.2s;
+    box-shadow: var(--shadow);
+  }
+  .shuffle-toggle:hover { border-color: var(--blue); }
+  .shuffle-toggle.selected { border-color: var(--blue); background: rgba(0,56,168,0.05); }
+
+  .checkbox-box {
+    width: 26px; height: 26px;
+    border: 2px solid var(--blue);
+    border-radius: 6px;
+    display: flex; align-items: center; justify-content: center;
+    color: var(--blue);
+    font-weight: 800;
+    font-size: 16px;
+    flex-shrink: 0;
+  }
+
+  .shuffle-label { font-weight: 700; color: var(--text); font-size: 15px; }
+  .shuffle-sub { font-size: 12px; color: var(--muted); }
+
+  .btn-start {
+    display: none;
+    background: linear-gradient(135deg, var(--blue), #3f51b5);
+    color: white;
+    border: none;
+    padding: 16px 60px;
+    font-size: 18px;
+    font-family: 'Nunito', sans-serif;
+    font-weight: 800;
+    border-radius: 14px;
+    cursor: pointer;
+    letter-spacing: 1px;
+    transition: all 0.3s;
+    box-shadow: 0 8px 24px rgba(0,56,168,0.35);
+  }
+  .btn-start:hover { transform: translateY(-2px); box-shadow: 0 12px 32px rgba(0,56,168,0.45); }
+
+  /* ── QUIZ CONTENT ── */
+  .quiz-wrap {
+    display: none;
+    animation: fadeUp 0.4s ease;
+  }
+
+  .q-card {
+    background: var(--card);
+    border-radius: 20px;
+    padding: 32px;
+    box-shadow: var(--shadow);
+    margin-bottom: 16px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .q-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, var(--blue), var(--red));
+  }
+
+  .q-num {
+    font-size: 12px;
+    font-weight: 800;
+    color: var(--blue);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 12px;
+  }
+
+  .q-text {
+    font-size: 17px;
+    line-height: 1.7;
+    color: var(--text);
+    font-weight: 600;
+    margin-bottom: 24px;
+  }
+
+  .choices { display: flex; flex-direction: column; gap: 10px; }
+
+  .choice {
+    background: var(--white);
+    border: 2px solid #e5e7eb;
+    border-radius: 12px;
+    padding: 14px 18px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    transition: all 0.25s;
+    font-weight: 600;
+    color: var(--text);
+  }
+
+  body.dark .choice { background: rgba(255,255,255,0.05); border-color: rgba(255,255,255,0.1); }
+
+  .choice:hover:not(.disabled) {
+    border-color: var(--blue);
+    background: rgba(0,56,168,0.05);
+    transform: translateX(4px);
+  }
+
+  .choice-ltr {
+    width: 36px; height: 36px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--blue), #3f51b5);
+    color: white;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 800;
+    font-size: 14px;
+    flex-shrink: 0;
+  }
+
+  .choice.correct { background: var(--correct-bg); border-color: var(--correct); }
+  .choice.correct .choice-ltr { background: var(--correct); }
+  .choice.wrong { background: var(--wrong-bg); border-color: var(--wrong); }
+  .choice.wrong .choice-ltr { background: var(--wrong); }
+  .choice.disabled { cursor: not-allowed; }
+
+  .feedback {
+    margin-top: 16px;
+    padding: 14px 18px;
+    border-radius: 12px;
+    font-weight: 700;
+    font-size: 15px;
+    display: none;
+    align-items: center;
+    gap: 10px;
+  }
+  .feedback.show { display: flex; }
+  .feedback.correct { background: var(--correct-bg); color: var(--correct); }
+  .feedback.wrong { background: var(--wrong-bg); color: var(--wrong); }
+
+  /* ── NAVIGATION ── */
+  .nav-bar {
+    display: none;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+    padding: 16px 0;
+  }
+
+  .btn {
+    padding: 12px 24px;
+    border: none;
+    border-radius: 10px;
+    font-size: 14px;
+    font-family: 'Nunito', sans-serif;
+    font-weight: 800;
+    cursor: pointer;
+    transition: all 0.2s;
+    letter-spacing: 0.5px;
+  }
+  .btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+  .btn-prev { background: #6b7280; color: white; }
+  .btn-prev:hover:not(:disabled) { background: #4b5563; }
+
+  .btn-next { background: linear-gradient(135deg, var(--blue), #3f51b5); color: white; box-shadow: 0 4px 12px rgba(0,56,168,0.3); }
+  .btn-next:hover:not(:disabled) { transform: translateY(-1px); }
+
+  .btn-reset { background: var(--red); color: white; }
+  .btn-reset:hover { background: #b91c1c; }
+
+  /* ── RESULT ── */
+  .result-screen {
+    display: none;
+    text-align: center;
+    animation: fadeUp 0.5s ease;
+  }
+  .result-screen.active { display: block; }
+
+  .result-card {
+    background: var(--card);
+    border-radius: 24px;
+    padding: 48px 32px;
+    box-shadow: var(--shadow);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .result-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 6px;
+    background: linear-gradient(90deg, var(--blue), var(--red), var(--sun));
+  }
+
+  .result-icon { font-size: 72px; margin-bottom: 16px; }
+  .result-score {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 64px;
+    color: var(--blue);
+    letter-spacing: 3px;
+    line-height: 1;
+    margin-bottom: 12px;
+  }
+  .result-msg { font-size: 20px; font-weight: 700; color: var(--text); margin-bottom: 28px; }
+
+  .result-stats {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+    margin-bottom: 28px;
+  }
+
+  .stat-box {
+    background: var(--white);
+    border-radius: 12px;
+    padding: 16px;
+    font-weight: 700;
+  }
+  body.dark .stat-box { background: rgba(255,255,255,0.08); }
+  .stat-label { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px; }
+  .stat-val { font-size: 28px; color: var(--text); font-family: 'Bebas Neue', sans-serif; letter-spacing: 1px; }
+
+  .result-btns { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+  .btn-review { background: #f59e0b; color: white; padding: 14px 32px; font-size: 16px; }
+  .btn-review:hover { background: #d97706; }
+  .btn-restart { background: linear-gradient(135deg, var(--blue), #3f51b5); color: white; padding: 14px 32px; font-size: 16px; box-shadow: 0 4px 16px rgba(0,56,168,0.3); }
+  .btn-restart:hover { transform: translateY(-1px); }
+
+  /* ── MODALS ── */
+  .modal {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.6);
+    z-index: 100;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+    backdrop-filter: blur(4px);
+  }
+  .modal.active { display: flex; }
+
+  .modal-box {
+    background: var(--card);
+    border-radius: 20px;
+    padding: 36px 28px;
+    max-width: 420px;
+    width: 100%;
+    text-align: center;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+    animation: popIn 0.3s ease;
+  }
+
+  .modal-icon { font-size: 52px; margin-bottom: 16px; }
+  .modal-title { font-family: 'Bebas Neue', sans-serif; font-size: 26px; color: var(--text); letter-spacing: 2px; margin-bottom: 10px; }
+  .modal-msg { font-size: 15px; color: var(--muted); margin-bottom: 24px; line-height: 1.6; }
+
+  .modal-btns { display: flex; gap: 12px; justify-content: center; }
+  .btn-cancel { background: #6b7280; color: white; padding: 12px 28px; }
+  .btn-cancel:hover { background: #4b5563; }
+  .btn-confirm { background: var(--red); color: white; padding: 12px 28px; }
+  .btn-confirm:hover { background: #b91c1c; }
+
+  /* Review modal */
+  .review-modal-box {
+    background: var(--card);
+    border-radius: 20px;
+    max-width: 680px;
+    width: 100%;
+    max-height: 85vh;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+    animation: popIn 0.3s ease;
+  }
+
+  .review-header {
+    padding: 20px 24px;
+    border-bottom: 2px solid rgba(0,56,168,0.1);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: sticky;
+    top: 0;
+    background: var(--card);
+    z-index: 10;
+  }
+
+  .review-title { font-family: 'Bebas Neue', sans-serif; font-size: 22px; color: var(--text); letter-spacing: 2px; }
+  .close-btn { background: none; border: none; font-size: 24px; cursor: pointer; color: var(--muted); padding: 4px 8px; border-radius: 8px; transition: background 0.2s; }
+  .close-btn:hover { background: rgba(0,0,0,0.08); }
+
+  .review-body { padding: 20px; overflow-y: auto; }
+
+  .review-item {
+    background: var(--white);
+    border-radius: 12px;
+    padding: 16px;
+    margin-bottom: 12px;
+  }
+  body.dark .review-item { background: rgba(255,255,255,0.05); }
+  .review-q { font-weight: 700; color: var(--text); margin-bottom: 8px; font-size: 14px; }
+  .review-a { padding: 8px 12px; border-radius: 8px; font-size: 13px; font-weight: 600; }
+  .review-correct { background: var(--correct-bg); color: var(--correct); }
+  .review-wrong { background: var(--wrong-bg); color: var(--wrong); }
+
+  /* Welcome modal */
+  .welcome-modal-box {
+    background: var(--card);
+    border-radius: 24px;
+    padding: 40px 32px;
+    max-width: 460px;
+    width: 100%;
+    text-align: center;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+    animation: popIn 0.4s ease;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .welcome-modal-box::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 6px;
+    background: linear-gradient(90deg, var(--blue), var(--red), var(--sun), var(--red), var(--blue));
+  }
+
+  .btn-welcome {
+    background: linear-gradient(135deg, var(--blue), #3f51b5);
+    color: white;
+    padding: 14px 48px;
+    font-size: 17px;
+    border-radius: 12px;
+    box-shadow: 0 8px 24px rgba(0,56,168,0.35);
+  }
+  .btn-welcome:hover { transform: translateY(-2px); }
+
+  /* Unanswered modal */
+  .unanswered-list {
+    background: #fffbeb;
+    border: 1px solid #fcd34d;
+    border-radius: 10px;
+    padding: 14px;
+    margin: 16px 0;
+    text-align: left;
+    font-size: 14px;
+    color: #92400e;
+    font-weight: 600;
+  }
+  body.dark .unanswered-list { background: #451a03; border-color: #92400e; color: #fcd34d; }
+
+  /* ── ANIMATIONS ── */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes popIn {
+    from { opacity: 0; transform: scale(0.9); }
+    to { opacity: 1; transform: scale(1); }
+  }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 600px) {
+    .header h1 { font-size: 26px; }
+    .start-title { font-size: 32px; }
+    .q-text { font-size: 15px; }
+    .result-score { font-size: 48px; }
+    .q-card { padding: 20px; }
+    .result-card { padding: 32px 20px; }
+    .result-stats { grid-template-columns: 1fr 1fr; }
+    .btn { padding: 10px 16px; font-size: 12px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ══ HEADER ══ -->
+<div class="header">
+  <div class="header-top">
+    <button class="back-btn" id="backBtn" onclick="showBackModal()">← Back</button>
+    <div class="flag-stars">⭐</div>
+    <h1>PHILCUL BAGSAKAN</h1>
+    <div class="flag-stars">🌟</div>
+    <button class="theme-btn" id="themeBtn" onclick="toggleTheme()">🌙</button>
+  </div>
+  <div class="header-sub">Philippine Culture &amp; Tourism Geography</div>
+  <div class="progress-wrap" id="progressWrap">
+    <div class="progress-bar">
+      <div class="progress-fill" id="progressFill"></div>
+    </div>
+    <div class="progress-stats">
+      <span>Question <span id="qCurrent">1</span> / <span id="qTotal">1</span></span>
+      <span>Score: <span id="scoreDisplay">0</span> / <span id="answeredDisplay">0</span></span>
+    </div>
+  </div>
+</div>
+
+<!-- ══ MAIN ══ -->
+<div class="container">
+
+  <!-- START SCREEN -->
+  <div class="start-screen active" id="startScreen">
+    <div style="margin-bottom: 8px;">
+      <span class="welcome-badge">🇵🇭 TH2205 — PhilCul</span>
+    </div>
+    <div class="start-title">IBAGSAK MO BAYBEH!</div>
+    <div class="start-desc">Test your knowledge on the Regions of the Philippines. Choose your topic and let's go!</div>
+
+    <div class="subject-card" id="subjectCard" onclick="selectSubject()">
+      <div class="card-emoji">🗺️</div>
+      <div class="card-title">Handout 3 — Regions of the Philippines</div>
+      <div class="card-sub">Regions · Provinces · Capitals · Nicknames · Constitution</div>
+      <div class="card-count">150 Questions</div>
+    </div>
+
+    <div class="shuffle-toggle" id="shuffleToggle" onclick="toggleShuffle()">
+      <div class="checkbox-box" id="checkBox"></div>
+      <div>
+        <div class="shuffle-label">🔀 Shuffle Questions</div>
+        <div class="shuffle-sub">Randomize the order for a new challenge</div>
+      </div>
+    </div>
+
+    <button class="btn btn-start" id="startBtn" onclick="startQuiz()">Start Exam 🚀</button>
+  </div>
+
+  <!-- QUIZ -->
+  <div class="quiz-wrap" id="quizWrap">
+    <div class="q-card">
+      <div class="q-num" id="qNum"></div>
+      <div class="q-text" id="qText"></div>
+      <div class="choices" id="choices"></div>
+      <div class="feedback" id="feedback"></div>
+    </div>
+  </div>
+
+  <!-- RESULT -->
+  <div class="result-screen" id="resultScreen">
+    <div class="result-card">
+      <div class="result-icon" id="resultIcon">🎉</div>
+      <div class="result-score" id="resultScore"></div>
+      <div class="result-msg" id="resultMsg"></div>
+      <div class="result-stats">
+        <div class="stat-box">
+          <div class="stat-label">Total Questions</div>
+          <div class="stat-val" id="statTotal"></div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-label">Correct</div>
+          <div class="stat-val" style="color: var(--correct);" id="statCorrect"></div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-label">Wrong</div>
+          <div class="stat-val" style="color: var(--wrong);" id="statWrong"></div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-label">Percentage</div>
+          <div class="stat-val" id="statPercent"></div>
+        </div>
+      </div>
+      <div class="result-btns">
+        <button class="btn btn-review" onclick="showReview()">📋 Review Answers</button>
+        <button class="btn btn-restart" onclick="restartQuiz()">🔄 Restart Exam</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- NAV BAR -->
+  <div class="nav-bar" id="navBar">
+    <button class="btn btn-prev" id="prevBtn" onclick="prevQ()">← Prev</button>
+    <button class="btn btn-reset" onclick="showResetModal()">⟳ Reset</button>
+    <button class="btn btn-next" id="nextBtn" onclick="nextQ()">Next →</button>
+  </div>
+
+</div>
+
+<!-- ══ MODALS ══ -->
+
+<!-- Welcome -->
+<div class="modal active" id="welcomeModal">
+  <div class="welcome-modal-box">
+    <div style="font-size: 60px; margin-bottom: 16px;">🇵🇭</div>
+    <div class="modal-title">MABUHAY!</div>
+    <div class="modal-msg" style="margin-bottom: 20px; line-height: 1.8; color: var(--muted);">
+      Welcome to the <strong style="color: var(--blue);">PhilCul Bagsakan</strong>! Review the Regions of the Philippines and ace your exam. Good luck! 🎉
+    </div>
+    <div style="background: rgba(0,56,168,0.06); padding: 16px; border-radius: 12px; margin-bottom: 24px; font-size: 13px; color: var(--muted);">
+      Need a website or system? Hit me up on
+      <a href="https://www.facebook.com/christianlife.fb" target="_blank" style="color: var(--blue); font-weight: 700;">Facebook 📘</a>
+    </div>
+    <button class="btn btn-welcome" onclick="closeWelcome()">Tara na! 🚀</button>
+  </div>
+</div>
+
+<!-- Reset -->
+<div class="modal" id="resetModal">
+  <div class="modal-box">
+    <div class="modal-icon">⚠️</div>
+    <div class="modal-title">Reset Exam?</div>
+    <div class="modal-msg">All your progress will be lost. Are you sure?</div>
+    <div class="modal-btns">
+      <button class="btn btn-cancel" onclick="closeModal('resetModal')">Cancel</button>
+      <button class="btn btn-confirm" onclick="confirmReset()">Reset</button>
+    </div>
+  </div>
+</div>
+
+<!-- Back -->
+<div class="modal" id="backModal">
+  <div class="modal-box">
+    <div class="modal-icon">⚠️</div>
+    <div class="modal-title">Go Back?</div>
+    <div class="modal-msg">Your progress will be lost if you go back to the start.</div>
+    <div class="modal-btns">
+      <button class="btn btn-cancel" onclick="closeModal('backModal')">Cancel</button>
+      <button class="btn btn-confirm" onclick="confirmBack()">Go Back</button>
+    </div>
+  </div>
+</div>
+
+<!-- Unanswered -->
+<div class="modal" id="unansweredModal">
+  <div class="modal-box">
+    <div class="modal-icon">📝</div>
+    <div class="modal-title">Unanswered Questions!</div>
+    <div class="modal-msg" id="unansweredMsg"></div>
+    <div class="unanswered-list" id="unansweredList"></div>
+    <div class="modal-btns">
+      <button class="btn btn-cancel" onclick="closeModal('unansweredModal')">OK, I'll finish</button>
+    </div>
+  </div>
+</div>
+
+<!-- Review -->
+<div class="modal" id="reviewModal">
+  <div class="review-modal-box">
+    <div class="review-header">
+      <div class="review-title">📋 Question Review</div>
+      <button class="close-btn" onclick="closeModal('reviewModal')">✕</button>
+    </div>
+    <div class="review-body" id="reviewBody"></div>
+  </div>
+</div>
+
+<script>
+const LETTERS = ['A','B','C','D'];
+
+const philculQ = [
+  // ── TERRITORIAL & CONSTITUTIONAL ──
+  { q:"According to Section 1, Article X of the 1987 Constitution, which are the territorial and political subdivisions of the Philippines?", choices:["Regions, provinces, and cities","Provinces, cities, municipalities, and barangays","Barangays, municipalities, and autonomous regions","Cities, provinces, and regions"], answer:"B" },
+  { q:"According to the 1987 Constitution, where shall there be autonomous regions?", choices:["Luzon and Visayas","Muslim Mindanao and the Cordilleras","Mindanao and Palawan","Visayas and Mindanao"], answer:"B" },
+  { q:"Which section of Article X states that Congress shall enact a local government code providing for a more responsive and accountable local government through decentralization?", choices:["Section 1","Section 2","Section 3","Section 4"], answer:"C" },
+  { q:"What does Section 4 of Article X state about the President of the Philippines?", choices:["The President directly manages all local government units","The President exercises general supervision over local governments","The President appoints all local officials","The President controls the budget of all regions"], answer:"B" },
+  { q:"Who is responsible for the defense and security of the autonomous regions?", choices:["Local police agencies","Autonomous regional government","The National Government","Provincial governors"], answer:"C" },
+  { q:"Who is responsible for the preservation of peace and order within the regions?", choices:["The National Government","Local police agencies","The Armed Forces of the Philippines","The regional governors"], answer:"B" },
+  { q:"Autonomous regions are created for areas sharing common and distinctive what?", choices:["Language and religion only","Historical and cultural heritages, economic and social structures","Political affiliations and military alliances","Geographic boundaries and climates"], answer:"B" },
+
+  // ── NUMBER OF REGIONS ──
+  { q:"As of July 2025, how many regions is the Philippines subdivided into?", choices:["16","17","18","19"], answer:"C" },
+  { q:"How many regions are in Luzon as of July 2025?", choices:["6","7","8","9"], answer:"C" },
+  { q:"How many regions are in the Visayas as of July 2025?", choices:["3","4","5","6"], answer:"B" },
+  { q:"How many regions are in Mindanao as of July 2025?", choices:["5","6","7","8"], answer:"B" },
+  { q:"How many provinces does the Philippines have?", choices:["78","80","82","85"], answer:"C" },
+  { q:"How many cities does the Philippines have?", choices:["138","142","146","150"], answer:"C" },
+  { q:"How many highly urbanized cities (HUCs) are there in the Philippines?", choices:["30","33","36","38"], answer:"B" },
+  { q:"How many independent component cities are there in the Philippines?", choices:["3","4","5","6"], answer:"C" },
+  { q:"How many municipalities does the Philippines have?", choices:["1,388","1,488","1,588","1,688"], answer:"B" },
+
+  // ── NCR ──
+  { q:"What is the National Capital Region also known as?", choices:["Greater Manila Area","Metropolitan Manila","Metro Luzon","Central Luzon"], answer:"B" },
+  { q:"NCR is the country's political, economic, and educational center. How many cities and municipalities does it have?", choices:["15 cities and 2 municipalities","16 cities and 1 municipality","17 cities and 1 municipality","18 cities only"], answer:"B" },
+  { q:"Which is the only municipality in NCR?", choices:["San Juan","Navotas","Pateros","Malabon"], answer:"C" },
+  { q:"Which is the only region in the Philippines without any province?", choices:["CAR","Region III","NCR","Region IV-A"], answer:"C" },
+  { q:"Where is the Ninoy Aquino International Airport (NAIA) located?", choices:["Between Manila and Pasay","Between Parañaque City and Pasay City","Between Makati and Taguig","Between Pasig and Marikina"], answer:"B" },
+  { q:"Which of the following is NOT a city in NCR?", choices:["Malabon","Valenzuela","San Fernando","Navotas"], answer:"C" },
+  { q:"Which of the following is a tourist attraction in NCR?", choices:["Chocolate Hills","Mayon Volcano","Rizal Park","Banaue Rice Terraces"], answer:"C" },
+
+  // ── CAR ──
+  { q:"Which is the only landlocked region of the Philippines?", choices:["Region I","NCR","CAR","Region II"], answer:"C" },
+  { q:"What are the indigenous tribes of the Cordillera Administrative Region collectively called?", choices:["Aeta","Igorot","Lumad","Dumagat"], answer:"B" },
+  { q:"What nickname has CAR been given due to its many linguistic sub-dialects?", choices:["Most diverse agricultural region","Most diversified ethnolinguistic region","Most culturally advanced region","Most rugged terrain region"], answer:"B" },
+  { q:"The Banaue Rice Terraces is located in which province of CAR?", choices:["Benguet","Kalinga","Abra","Ifugao"], answer:"D" },
+  { q:"Sumaguing Cave is located in which municipality of CAR?", choices:["Baguio","Bontoc","Sagada","Tabuk"], answer:"C" },
+  { q:"What is the capital of Benguet?", choices:["Baguio City","La Trinidad","Bangued","Lagawe"], answer:"B" },
+  { q:"What is the capital of Kalinga?", choices:["Bontoc","Bangued","Kabugao","Tabuk"], answer:"D" },
+  { q:"What is the capital of Mountain Province?", choices:["Tabuk","Bontoc","Lagawe","La Trinidad"], answer:"B" },
+  { q:"What is the capital of Abra?", choices:["Bangued","Kabugao","Lagawe","Bontoc"], answer:"A" },
+  { q:"What is the capital of Apayao?", choices:["Bangued","Kabugao","La Trinidad","Lagawe"], answer:"B" },
+  { q:"What is the capital of Ifugao?", choices:["Tabuk","Bontoc","Lagawe","La Trinidad"], answer:"C" },
+
+  // ── REGION I ──
+  { q:"Where is Region I – Ilocos Region located?", choices:["Southern coast of Luzon","Northern coast of Luzon","Eastern coast of Luzon","Western coast of Mindanao"], answer:"B" },
+  { q:"Which dialects are used in Region I – Ilocos Region?", choices:["Tagalog and Ilocano","Ilocano and Pangasinense","Kapampangan and Ilocano","Pangasinense and Tagalog"], answer:"B" },
+  { q:"What is the capital of Ilocos Norte?", choices:["Vigan","Laoag","Lingayen","San Fernando"], answer:"B" },
+  { q:"What is the capital of Ilocos Sur?", choices:["Laoag","San Fernando","Vigan","Bangued"], answer:"C" },
+  { q:"What is the capital of La Union?", choices:["Lingayen","San Fernando","Laoag","Baguio"], answer:"B" },
+  { q:"What is the capital of Pangasinan?", choices:["Dagupan","San Fernando","Laoag","Lingayen"], answer:"D" },
+
+  // ── REGION II ──
+  { q:"Region II – Cagayan Valley is located in which part of Luzon?", choices:["Northwestern","Southwestern","Northeastern","Southeastern"], answer:"C" },
+  { q:"What mountain ranges bound Region II?", choices:["Sierra Madre and Caraballo Mountains","Cordillera Mountain Range to the west and Sierra Madre Mountain Range to the east","Zambales and Caraballo Mountains","Cordillera and Caraballo Mountain Ranges"], answer:"B" },
+  { q:"What is the capital of Batanes?", choices:["Tuguegarao","Basco","Ilagan","Bayombong"], answer:"B" },
+  { q:"What is the capital of Cagayan?", choices:["Basco","Ilagan","Tuguegarao","Cabarroguis"], answer:"C" },
+  { q:"What is the capital of Isabela?", choices:["Basco","Tuguegarao","Ilagan","Bayombong"], answer:"C" },
+  { q:"What is the capital of Nueva Vizcaya?", choices:["Cabarroguis","Bayombong","Basco","Ilagan"], answer:"B" },
+  { q:"What is the capital of Quirino?", choices:["Bayombong","Tuguegarao","Cabarroguis","Basco"], answer:"C" },
+  { q:"Which tourist spot is found in Batanes, Region II?", choices:["Callao Cave","Batan Island","Aguinaldo Shrine","Mayon Volcano"], answer:"B" },
+
+  // ── REGION III ──
+  { q:"Which province of Region III earned the nickname 'Rice Granary of the Philippines' for the entire region?", choices:["Bulacan","Pampanga","Nueva Ecija","Aurora"], answer:"C" },
+  { q:"What is the major dialect spoken in Region III – Central Luzon?", choices:["Cebuano","Ilocano","Tagalog","Kapampangan"], answer:"C" },
+  { q:"Where is the Clark International Airport located?", choices:["Tarlac province","Nueva Ecija","Pampanga province","Bulacan"], answer:"C" },
+  { q:"What is the capital of Bataan?", choices:["Baler","Balanga","Malolos","Palayan"], answer:"B" },
+  { q:"What is the capital of Bulacan?", choices:["Baler","Balanga","Malolos","San Fernando"], answer:"C" },
+  { q:"What is the capital of Aurora?", choices:["Balanga","Baler","Malolos","Palayan"], answer:"B" },
+  { q:"What is the capital of Nueva Ecija?", choices:["San Fernando","Malolos","Baler","Palayan"], answer:"D" },
+  { q:"What is the capital of Pampanga?", choices:["Tarlac City","San Fernando","Malolos","Iba"], answer:"B" },
+  { q:"What is the capital of Zambales?", choices:["Iba","Baler","Balanga","San Fernando"], answer:"A" },
+  { q:"What is the capital of Tarlac?", choices:["San Fernando","Iba","Tarlac City","Malolos"], answer:"C" },
+  { q:"Which tourist attraction in Region III is located in Bataan?", choices:["Mt. Arayat National Park","Pagsanjan Falls","Mt. Samat","Banaue Rice Terraces"], answer:"C" },
+
+  // ── REGION IV-A ──
+  { q:"What does CALABARZON stand for in Region IV-A?", choices:["Cavite, Albay, Laguna, Batangas, Aurora, Rizal, and Zambales","Camarines, Abra, Laguna, Batangas, Antique, Romblon, and Zamboanga","Cavite, Laguna, Batangas, Quezon, and Rizal","Cebu, Albay, Laguna, Bataan, Agusan, Rizal, and Zamboanga Norte"], answer:"C" },
+  { q:"Region IV-A is known as the what of the Philippines?", choices:["Rice Granary","Fruit Basket","Industrial Powerhouse","Culinary Capital"], answer:"C" },
+  { q:"What is the capital of Batangas in Region IV-A?", choices:["Imus","Antipolo","Batangas City","Lucena"], answer:"C" },
+  { q:"What is the capital of Cavite?", choices:["Batangas City","Imus","Santa Cruz","Antipolo"], answer:"B" },
+  { q:"What is the capital of Laguna?", choices:["Imus","Santa Cruz","Lucena","Antipolo"], answer:"B" },
+  { q:"What is the capital of Quezon province?", choices:["Antipolo","Santa Cruz","Imus","Lucena"], answer:"D" },
+  { q:"What is the capital of Rizal?", choices:["Lucena","Antipolo","Imus","Santa Cruz"], answer:"B" },
+  { q:"Taal Lake and Taal Volcano are found in which province?", choices:["Cavite","Laguna","Batangas","Quezon"], answer:"C" },
+  { q:"Pagsanjan Falls is located in which province?", choices:["Batangas","Rizal","Cavite","Laguna"], answer:"D" },
+
+  // ── REGION IV-B ──
+  { q:"What is the other name for Region IV-B – MIMAROPA?", choices:["Northern Tagalog Islands","Southern Tagalog Islands","Central Philippine Islands","Western Philippine Islands"], answer:"B" },
+  { q:"Which tourist spot in MIMAROPA is located in Palawan?", choices:["Poctoy White Beach","Tabon Caves","Puerto Princesa Subterranean River National Park","All of these"], answer:"D" },
+  { q:"What is the capital of Palawan?", choices:["Boac","Mamburao","Puerto Princesa","Romblon"], answer:"C" },
+  { q:"What is the capital of Marinduque?", choices:["Boac","Calapan","Mamburao","Romblon"], answer:"A" },
+  { q:"What is the capital of Occidental Mindoro?", choices:["Mamburao","Calapan","Boac","Puerto Princesa"], answer:"A" },
+  { q:"What is the capital of Oriental Mindoro?", choices:["Mamburao","Calapan","Boac","Romblon"], answer:"B" },
+
+  // ── REGION V ──
+  { q:"Region V – Bicol Region is also known as?", choices:["Bicolana","Bicolandia","Bicolano","Bicolnon"], answer:"B" },
+  { q:"Which province contains the Mayon Volcano?", choices:["Camarines Sur","Sorsogon","Albay","Masbate"], answer:"C" },
+  { q:"Mayon Volcano is famous for what feature?", choices:["Its explosive eruptions only","Its perfect conical shape","Its location near the sea","Its ancient lava flows"], answer:"B" },
+  { q:"What are the official dialects in Region V – Bicol Region?", choices:["Tagalog and Bisaya","Ilocano and Tagalog","Bikol and Filipino","Waray-Waray and Bikol"], answer:"C" },
+  { q:"What is the capital of Albay?", choices:["Daet","Pili","Legazpi","Virac"], answer:"C" },
+  { q:"What is the capital of Camarines Norte?", choices:["Legazpi","Daet","Pili","Virac"], answer:"B" },
+  { q:"What is the capital of Camarines Sur?", choices:["Legazpi","Daet","Pili","Virac"], answer:"C" },
+  { q:"What is the capital of Catanduanes?", choices:["Legazpi","Daet","Pili","Virac"], answer:"D" },
+  { q:"What is the capital of Masbate?", choices:["Sorsogon City","Legazpi","Daet","Masbate City"], answer:"D" },
+
+  // ── REGION VI ──
+  { q:"Region VI – Western Visayas is located in which section of the Visayas?", choices:["Eastern","Central","Western","Northern"], answer:"C" },
+  { q:"Which festival in Region VI is held annually in Kalibo, Aklan?", choices:["Sinulog Festival","Pahiyas Festival","Kadayawan Festival","Ati-Atihan Festival"], answer:"D" },
+  { q:"Boracay Island is located in which province?", choices:["Iloilo","Capiz","Antique","Aklan"], answer:"D" },
+  { q:"Boracay Island is hailed as what?", choices:["Surfing Capital of the Philippines","Beach Capital of the Philippines","Pearl of the Orient","Island of Fire"], answer:"B" },
+  { q:"What is the capital of Aklan?", choices:["Iloilo City","Roxas City","Kalibo","Jordan"], answer:"C" },
+  { q:"What is the capital of Antique?", choices:["Kalibo","Iloilo City","San Jose de Buenavista","Roxas City"], answer:"C" },
+  { q:"What is the capital of Capiz?", choices:["Kalibo","Jordan","Iloilo City","Roxas City"], answer:"D" },
+  { q:"What is the capital of Guimaras?", choices:["Iloilo City","Jordan","Roxas City","Kalibo"], answer:"B" },
+  { q:"Which dialect is spoken in Capiz, Region VI?", choices:["Aklanon","Kinaray-a","Hiligaynon","Cebuano"], answer:"C" },
+
+  // ── NIR ──
+  { q:"What is the NIR known for?", choices:["Rice and corn production","Rich cultural heritage, diverse languages, and natural wonders","Fishing and shipbuilding","Mining and forestry"], answer:"B" },
+  { q:"What is the capital of Negros Occidental?", choices:["Dumaguete","Bacolod","Siquijor","Iloilo City"], answer:"B" },
+  { q:"What is the capital of Negros Oriental?", choices:["Bacolod","Siquijor","Dumaguete","Kalibo"], answer:"C" },
+  { q:"Apo Island, a world-renowned diving site, is located in which province?", choices:["Negros Occidental","Siquijor","Negros Oriental","Guimaras"], answer:"C" },
+
+  // ── REGION VII ──
+  { q:"Which language is dominantly spoken in Region VII – Central Visayas?", choices:["Hiligaynon","Waray-Waray","Cebuano","Ilocano"], answer:"C" },
+  { q:"The Chocolate Hills are located in which province of Region VII?", choices:["Cebu","Siquijor","Bohol","Leyte"], answer:"C" },
+  { q:"Magellan's Cross is found in which city of Region VII?", choices:["Tagbilaran","Cebu City","Iloilo City","Bacolod"], answer:"B" },
+  { q:"What is the capital of Bohol?", choices:["Cebu City","Tagbilaran","Dumaguete","Jordan"], answer:"B" },
+
+  // ── REGION VIII ──
+  { q:"Which bridge connects Leyte and Samar in Region VIII?", choices:["Marcelo Fernan Bridge","San Juanico Bridge","Mactan-Mandaue Bridge","Panguil Bay Bridge"], answer:"B" },
+  { q:"Which languages are mainly spoken in Region VIII?", choices:["Tagalog and Ilocano","Cebuano and Waray-Waray","Hiligaynon and Cebuano","Bisaya and Maranao"], answer:"B" },
+  { q:"What is the capital of Leyte?", choices:["Maasin","Naval","Catbalogan","Tacloban"], answer:"D" },
+  { q:"What is the capital of Biliran?", choices:["Tacloban","Catbalogan","Naval","Borongan"], answer:"C" },
+  { q:"What is the capital of Eastern Samar?", choices:["Borongan","Catarman","Catbalogan","Tacloban"], answer:"A" },
+  { q:"What is the capital of Samar?", choices:["Borongan","Catarman","Maasin","Catbalogan"], answer:"D" },
+  { q:"Red Beach is a tourist attraction in which province of Region VIII?", choices:["Biliran","Eastern Samar","Northern Samar","Leyte"], answer:"D" },
+
+  // ── REGION IX ──
+  { q:"Region IX – Zamboanga Peninsula occupies which section of Mindanao?", choices:["Eastern","Northern","Western","Southern"], answer:"C" },
+  { q:"What seas bound Region IX?", choices:["South China Sea and Celebes Sea","Sulu Sea on the north and Moro Gulf of the Celebes Sea on the south","Pacific Ocean and Sulu Sea","Bohol Sea and Celebes Sea"], answer:"B" },
+  { q:"What is the capital of Zamboanga del Norte?", choices:["Pagadian","Ipil","Dipolog","Zamboanga City"], answer:"C" },
+  { q:"What is the capital of Zamboanga del Sur?", choices:["Dipolog","Ipil","Pagadian","Zamboanga City"], answer:"C" },
+  { q:"What is the capital of Zamboanga Sibugay?", choices:["Dipolog","Ipil","Pagadian","Zamboanga City"], answer:"B" },
+  { q:"What home industries can be found in Region IX?", choices:["Electronics and textiles","Rattan, furniture, basket weaving, and brass works","Mining and glass blowing","Ceramics and pottery"], answer:"B" },
+
+  // ── REGION X ──
+  { q:"Region X – Northern Mindanao occupies which section of Mindanao?", choices:["Southern","Eastern","Western","Northern"], answer:"D" },
+  { q:"What is the capital of Bukidnon?", choices:["Mambajao","Tubod","Oroquieta","Malaybalay"], answer:"D" },
+  { q:"What is the capital of Camiguin?", choices:["Malaybalay","Mambajao","Tubod","Oroquieta"], answer:"B" },
+  { q:"What is the capital of Lanao del Norte?", choices:["Oroquieta","Mambajao","Tubod","Cagayan de Oro"], answer:"C" },
+  { q:"What is the capital of Misamis Occidental?", choices:["Oroquieta","Cagayan de Oro","Tubod","Mambajao"], answer:"A" },
+  { q:"What is the capital of Misamis Oriental?", choices:["Oroquieta","Tubod","Cagayan de Oro","Mambajao"], answer:"C" },
+  { q:"Maria Cristina Falls is located in which province of Region X?", choices:["Bukidnon","Camiguin","Misamis Oriental","Lanao del Norte"], answer:"D" },
+
+  // ── REGION XI ──
+  { q:"Region XI – Davao Region is known as the what of the Philippines?", choices:["Rice Granary","Fruit Basket","Industrial Hub","Tuna Capital"], answer:"B" },
+  { q:"Which fruits are abundant in Region XI?", choices:["Mango and papaya","Durian, pineapples, bananas, and marang","Lanzones and rambutan only","Guava and jackfruit"], answer:"B" },
+  { q:"What is the capital of Davao del Norte?", choices:["Digos","Tagum","Mati","Nabunturan"], answer:"B" },
+  { q:"What is the capital of Davao del Sur?", choices:["Tagum","Mati","Digos","Malita"], answer:"C" },
+  { q:"What is the capital of Davao Occidental?", choices:["Digos","Nabunturan","Tagum","Malita"], answer:"D" },
+  { q:"What is the capital of Davao Oriental?", choices:["Digos","Tagum","Mati","Malita"], answer:"C" },
+  { q:"What is the capital of Davao de Oro (formerly Compostela Valley)?", choices:["Tagum","Mati","Digos","Nabunturan"], answer:"D" },
+  { q:"Mount Apo is located in which region?", choices:["Region X","Region XII","Region XI","BARMM"], answer:"C" },
+
+  // ── REGION XII ──
+  { q:"SOCCSKSARGEN is an acronym for which provinces and city?", choices:["South Cotabato, Cotabato, Sultan Kudarat, Sarangani, and General Santos City","Sulu, Cotabato, Cotabato Sur, Kidapawan, Sultan, Alabel, Romblon, and General Santos","South Cotabato, Compostela, Sultan Kudarat, Sarangani, and Gensan","Surigao, Cotabato, Compostela, Sultan Kudarat, and Sarangani"], answer:"A" },
+  { q:"What is the second-largest river in the Philippines found in Region XII?", choices:["Cagayan River","Agusan River","Rio Grande de Mindanao","Pasig River"], answer:"C" },
+  { q:"Lake Sebu is located in which province of Region XII?", choices:["Cotabato","Sarangani","Sultan Kudarat","South Cotabato"], answer:"D" },
+  { q:"What is the capital of Cotabato province?", choices:["Alabel","Koronadal","Kidapawan","Isulan"], answer:"C" },
+  { q:"What is the capital of South Cotabato?", choices:["Kidapawan","Isulan","Alabel","Koronadal"], answer:"D" },
+  { q:"What is the capital of Sultan Kudarat?", choices:["Koronadal","Kidapawan","Isulan","Alabel"], answer:"C" },
+  { q:"What is the capital of Sarangani?", choices:["Isulan","Koronadal","Kidapawan","Alabel"], answer:"D" },
+
+  // ── REGION XIII ──
+  { q:"Siargao Island, the 'Surfing Capital of the Philippines,' is found in which region?", choices:["Region XI","Region X","BARMM","Region XIII – Caraga"], answer:"D" },
+  { q:"What is the capital of Surigao del Norte?", choices:["Tandag","Cabadbaran","Surigao City","Prosperidad"], answer:"C" },
+  { q:"What is the capital of Surigao del Sur?", choices:["Surigao City","Cabadbaran","Prosperidad","Tandag"], answer:"D" },
+  { q:"What is the capital of Agusan del Norte?", choices:["Prosperidad","Tandag","Surigao City","Cabadbaran"], answer:"D" },
+  { q:"What is the capital of Agusan del Sur?", choices:["Cabadbaran","Tandag","Prosperidad","Surigao City"], answer:"C" },
+  { q:"What is the capital of Dinagat Islands?", choices:["Cabadbaran","San Jose","Prosperidad","Tandag"], answer:"B" },
+  { q:"Which is the most spoken dialect in Region XIII – Caraga?", choices:["Surigaonon","Cebuano","Manobo","Mamanwa"], answer:"B" },
+
+  // ── BARMM ──
+  { q:"What was BARMM formerly called?", choices:["Bangsamoro Republic","Autonomous Region in Muslim Mindanao (ARMM)","Muslim Mindanao Autonomous Region","Moro Region"], answer:"B" },
+  { q:"When was BARMM renamed after a plebiscite?", choices:["January 2018","July 2019","January 2019","March 2020"], answer:"C" },
+  { q:"What law created the basic government structure of BARMM?", choices:["Bangsamoro Peace Agreement","Bangsamoro Organic Law (BOL)","Republic Act 11550","Tripoli Agreement"], answer:"B" },
+  { q:"What are the most spoken native languages of the Moros?", choices:["Tagalog, Cebuano, and Maranao","Maguindanao, Tausug, and Maranao","Bisaya, Tausug, and Maguindanao","Aklanon, Maranao, and Tausug"], answer:"B" },
+  { q:"What is the capital of Lanao del Sur in BARMM?", choices:["Lamitan","Bongao","Jolo","Marawi"], answer:"D" },
+  { q:"What is the capital of Basilan?", choices:["Marawi","Jolo","Lamitan","Bongao"], answer:"C" },
+  { q:"What is the capital of Sulu?", choices:["Bongao","Lamitan","Jolo","Marawi"], answer:"C" },
+  { q:"What is the capital of Tawi-Tawi?", choices:["Jolo","Lamitan","Marawi","Bongao"], answer:"D" },
+  { q:"Through which Republic Act was Maguindanao divided into two provinces?", choices:["RA 11054","RA 11546","RA 11550","RA 11595"], answer:"C" },
+  { q:"What are the two new provinces created from the old Maguindanao?", choices:["Maguindanao East and Maguindanao West","Maguindanao Norte and Maguindanao Occidental","Maguindanao del Norte and Maguindanao del Sur","Maguindanao Highlands and Maguindanao Lowlands"], answer:"C" },
+  { q:"What is the capital of Maguindanao del Norte?", choices:["Buluan","Jolo","Datu Odin Sinsuat","Marawi"], answer:"C" },
+  { q:"What is the capital of Maguindanao del Sur?", choices:["Datu Odin Sinsuat","Buluan","Jolo","Lamitan"], answer:"B" },
+  { q:"Panampangan Island tourist destination is in which BARMM province?", choices:["Basilan","Sulu","Lanao del Sur","Tawi-Tawi"], answer:"D" },
+
+  // ── NICKNAMES ──
+  { q:"Which city is known as the 'Oldest City in the Philippines'?", choices:["Manila","Vigan","Cebu City","Davao City"], answer:"C" },
+  { q:"Which city is the 'Largest City in the Philippines'?", choices:["Cebu City","Quezon City","Manila","Davao City"], answer:"D" },
+  { q:"Which province is the 'Largest Province in the Philippines'?", choices:["Isabela","Cotabato","Palawan","Bukidnon"], answer:"C" },
+  { q:"Which province earned the nickname 'Rice Granary of the Philippines'?", choices:["Pampanga","Bulacan","Nueva Ecija","Tarlac"], answer:"C" },
+  { q:"Which place is known as the 'Culinary Capital of the Philippines'?", choices:["Pampanga","Batangas","Cebu","Iloilo"], answer:"A" },
+  { q:"Which province is called the 'Heart of the Philippines'?", choices:["Romblon","Laguna","Marinduque","Cebu"], answer:"C" },
+  { q:"Iloilo City is known as?", choices:["City of Golden Friendship","The First Queen City of the South","City of Gentle People","Ever Distinguished Loyal City"], answer:"B" },
+  { q:"Which city is the 'City of Gentle People'?", choices:["Iloilo City","Cagayan de Oro","Tagbilaran","Dumaguete"], answer:"D" },
+  { q:"Which city is the 'City of Golden Friendship'?", choices:["Cebu City","Davao City","Cagayan de Oro","Iloilo City"], answer:"C" },
+  { q:"Manila is known as the?", choices:["Pearl of the Orient","City of Stars","Ever Distinguished Loyal City","City of Pines"], answer:"C" },
+  { q:"General Santos City is known as the?", choices:["Sardines Capital","Tuna Capital","Durian Capital","Banana Capital"], answer:"B" },
+  { q:"Which province is the 'Sugarbowl of the Philippines'?", choices:["South Cotabato","Pampanga","Negros Occidental","Bukidnon"], answer:"C" },
+  { q:"Which place is the 'Marble Capital of the Philippines'?", choices:["Romblon","Bohol","Rizal","Camiguin"], answer:"A" },
+  { q:"What is Rizal province known as?", choices:["City of Pines","Cradle of Philippine Arts","Marble Capital","City of Stars"], answer:"B" },
+  { q:"Angono in Rizal is the?", choices:["Garments Capital of the Philippines","Arts Capital of the Philippines","Pilgrimage Capital of the Philippines","Shoe Capital of the Philippines"], answer:"B" },
+  { q:"Taytay in Rizal is known as the?", choices:["Arts Capital","Garments Capital of the Philippines","Shoe Capital","Marble Capital"], answer:"B" },
+  { q:"Which city is the 'Pilgrimage Capital of the Philippines and City in the Sky'?", choices:["Tagaytay","Baguio","Antipolo","Vigan"], answer:"C" },
+  { q:"La Union is the?", choices:["Surfing Capital of the North","Beach Capital of the Philippines","Whale Shark Capital","Nudibranch Capital"], answer:"A" },
+  { q:"Camiguin is known as?", choices:["Island of Fire","Island Born of Fire","Land of Fire","Mystical Island"], answer:"B" },
+  { q:"Which island is called 'Island of Fire'?", choices:["Camiguin","Dinagat Island","Biliran","Siquijor"], answer:"D" },
+  { q:"Which city is the 'Shoe Capital of the Philippines'?", choices:["Malabon","Marikina","San Juan","Navotas"], answer:"B" },
+  { q:"Cebu is the 'Gateway to...'?", choices:["Eastern Visayas","A Thousand Journeys","Luzon","The South"], answer:"B" },
+  { q:"Tarlac is the?", choices:["History Hub of Central Luzon","Melting Pot of Central Luzon","Rice Granary of Central Luzon","Culinary Capital of Central Luzon"], answer:"B" },
+  { q:"Bataan is known as?", choices:["Melting Pot of Central Luzon","Salad Bowl of the Philippines","History Hub of Central Luzon","Industrial Hub of Central Luzon"], answer:"C" },
+  { q:"Which province is the 'Mango Capital of the Philippines'?", choices:["Batangas","Cebu","Guimaras","Palawan"], answer:"C" },
+  { q:"Muntinlupa is known as?", choices:["The ProbinSyudad","The Vibrant City","The Emerald City","The Shoe Capital"], answer:"C" },
+  { q:"Taguig is known as?", choices:["The Emerald City","The ProbinSyudad","The City of Smiles","The City of Pines"], answer:"B" },
+  { q:"Which is the 'Beach Capital of the Philippines'?", choices:["La Union","Palawan","Cebu","Boracay, Aklan"], answer:"D" },
+  { q:"Batanes is known as?", choices:["Island Born of Fire","Forest Heartland of Cagayan Valley","Land of True Insulars","Land of the Howling Wind"], answer:"C" },
+  { q:"Which province is the 'Forest Heartland of Cagayan Valley'?", choices:["Batanes","Nueva Vizcaya","Isabela","Quirino"], answer:"D" },
+  { q:"What is Baguio City known as?", choices:["City of Majestic Waterfalls","Summer Capital of the Philippines and City of Pines","City of Golden Friendship","City of Fun and Adventure"], answer:"B" },
+  { q:"San Fernando in Pampanga is the?", choices:["Culinary Capital of the Philippines","Melting Pot of Central Luzon","Lantern Capital of the Philippines","History Hub of Central Luzon"], answer:"C" },
+  { q:"Which province is the 'Christmas Symbols Capital of the Philippines'?", choices:["Pampanga","Bulacan","Misamis Occidental","Batangas"], answer:"C" },
+  { q:"Benguet is the?", choices:["City of Pines","Salad Bowl of the Philippines","Strawberry and Rose Capital","Summer Capital"], answer:"B" },
+  { q:"Vigan in Ilocos Sur is the?", choices:["Oldest City in the Philippines","Heritage City of the Philippines","Shrine City of the Philippines","City of Fun and Adventure"], answer:"B" },
+  { q:"Tacloban City is the?", choices:["Gateway to Eastern Visayas","City of Peace and Friendship","City of Golden Friendship","Surfing Capital"], answer:"A" },
+  { q:"Tagbilaran is the?", choices:["City of Golden Friendship","City of Gentle People","City of Peace and Friendship","City of Stars"], answer:"C" },
+  { q:"Which city is the 'Bangus Capital of the Philippines'?", choices:["General Santos City","Zamboanga City","Dagupan City","Navotas City"], answer:"C" },
+  { q:"La Trinidad in Benguet is the?", choices:["Summer Capital","City of Pines","Strawberry and Rose Capital of the Philippines","Salad Bowl"], answer:"C" },
+  { q:"Donsol in Sorsogon is the?", choices:["Surfing Capital of the Philippines","Whale Shark Capital of the World","Nudibranch Capital of the Philippines","Whale and Dolphin Haven"], answer:"B" },
+  { q:"Which is the 'Mystical Island Province of Love'?", choices:["Siquijor","Camiguin","Biliran","Dinagat Island"], answer:"D" },
+  { q:"Davao is the?", choices:["Rice Granary and Beach Capital","Fruit Basket of the Philippines and King City of the South","Tuna Capital and Industrial Hub","Culinary Capital and City of Pines"], answer:"B" },
+  { q:"Dapitan City is the?", choices:["Heritage City of the Philippines","Shrine City of the Philippines","Whale Shark Capital","City of Majestic Waterfalls"], answer:"B" },
+  { q:"Pagadian City is the?", choices:["Venice of the South","Asia's Latin City","Little Hong Kong of the South","City of Flowers"], answer:"C" },
+  { q:"Sitangkai in Tawi-Tawi is the?", choices:["City of Flowers","Little Hong Kong of the South","Venice of the South","Asia's Latin City"], answer:"C" },
+  { q:"Zamboanga City is known as?", choices:["Little Hong Kong of the South and Venice of the South","Asia's Latin City, Sardines Capital of the Philippines, and City of Flowers","Orchid City and City of Gentle People","Venice of the South and City of Flowers"], answer:"B" },
+  { q:"Dipolog in Zamboanga del Norte is the?", choices:["Twin-City Province","Venice of the South","Orchid City of the Philippines","City of Gentle People"], answer:"C" },
+  { q:"Bukidnon is the?", choices:["Fruit Basket of the Philippines","Pineapple Capital","Durian and Banana Capital","Land of the Dreamweavers"], answer:"B" },
+  { q:"Bacolod is the?", choices:["City of Gentle People","City of Golden Friendship","The City of Smiles","City of Stars"], answer:"C" },
+  { q:"Catanduanes is the?", choices:["Island Born of Fire","Land of the Howling Wind","Island of Fire","Land of True Insulars"], answer:"B" },
+  { q:"Which city is known as 'The City of Majestic Waterfalls; Industrial City of the South'?", choices:["Cagayan de Oro","Davao City","Iligan, Lanao del Norte","General Santos City"], answer:"C" },
+  { q:"El Nido in Palawan is the?", choices:["Pearl of the Orient","Land of True Insulars","Heaven on Earth","Venice of the South"], answer:"C" },
+  { q:"South Cotabato is the?", choices:["Land of Mightiest Mountain","Land of the Dreamweavers","Pineapple Capital","Whale and Dolphin Haven"], answer:"B" },
+  { q:"Which city is known as the 'Oldest Province in the Philippines'?", choices:["Cebu","Batangas","Aklan","Ilocos Norte"], answer:"C" },
+  { q:"Aurora is the?", choices:["Land of Golden Sunrise","Land of True Insulars","Land of Howling Wind","Island Born of Fire"], answer:"A" },
+  { q:"Cagayan de Oro is also known as the?", choices:["Surfing Capital of the North","City of Golden Friendship and Whitewater Rafting Capital of the Philippines","Fruit Basket of the Philippines","Venice of the South"], answer:"B" },
+  { q:"Tagum City in Davao del Norte is the?", choices:["Durian and Banana Capital","Fruit Basket of the Philippines","Music Capital of the South","King City of the South"], answer:"C" },
+  { q:"Legazpi is the?", choices:["Land of Kasanggayahan","City of Fun and Adventure","Shrine City of the Philippines","City of Majestic Waterfalls"], answer:"B" },
+  { q:"Aklan is known as?", choices:["Beach Capital of the Philippines","The Oldest Province in the Philippines","Mango Capital of the Philippines","Arts Capital of the Philippines"], answer:"B" },
+
+  // ── MISC / APPLIED ──
+  { q:"Which region is known as the 'Fruit Basket of the Philippines' and a 'melting pot of cultural groups'?", choices:["Region X","Region XII","Region XI – Davao Region","BARMM"], answer:"C" },
+  { q:"Which region contains the Puerto Princesa Subterranean River National Park?", choices:["Region IV-A","Region V","Region IV-B – MIMAROPA","NIR"], answer:"C" },
+  { q:"The Ati-Atihan Festival is a celebration in honor of the?", choices:["Patron saint of Iloilo","Infant Jesus","Santo Niño and the Ati people","Local harvest festival"], answer:"B" },
+  { q:"Which region is bounded by Butuan Bay, Surigao Strait, and Bohol Sea on the north?", choices:["Region XI","Region X","Region XII","Region XIII – Caraga"], answer:"D" },
+  { q:"Quezon City is known as?", choices:["City of Stars and New Horizons","Ever Distinguished Loyal City","The Emerald City","City of Golden Friendship"], answer:"A" },
+];
+
+// ── STATE ──
+let activeData = [];
+let idx = 0;
+let userAnswers = [];
+let score = 0;
+let shuffleOn = false;
+let subjectSelected = false;
+
+// ── UTILS ──
+function shuffleArr(arr) {
+  const a = [...arr];
+  for (let i = a.length-1; i>0; i--) {
+    const j = Math.floor(Math.random()*(i+1));
+    [a[i],a[j]] = [a[j],a[i]];
+  }
+  return a;
+}
+
+function closeModal(id) { document.getElementById(id).classList.remove('active'); }
+
+// ── WELCOME ──
+function closeWelcome() {
+  document.getElementById('welcomeModal').classList.remove('active');
+}
+
+// ── THEME ──
+function toggleTheme() {
+  document.body.classList.toggle('dark');
+  document.getElementById('themeBtn').textContent = document.body.classList.contains('dark') ? '☀️' : '🌙';
+  localStorage.setItem('theme', document.body.classList.contains('dark') ? 'dark' : '');
+}
+
+// ── SUBJECT SELECT ──
+function selectSubject() {
+  subjectSelected = true;
+  document.getElementById('subjectCard').classList.add('selected');
+  document.getElementById('shuffleToggle').style.display = 'flex';
+  document.getElementById('startBtn').style.display = 'inline-block';
+  setTimeout(() => document.getElementById('shuffleToggle').scrollIntoView({ behavior:'smooth', block:'center' }), 100);
+}
+
+function toggleShuffle() {
+  shuffleOn = !shuffleOn;
+  document.getElementById('checkBox').textContent = shuffleOn ? '✓' : '';
+  document.getElementById('shuffleToggle').classList.toggle('selected', shuffleOn);
+}
+
+// ── START ──
+function startQuiz() {
+  if (!subjectSelected) return alert('Please select a topic first!');
+  activeData = shuffleOn ? shuffleArr(philculQ) : [...philculQ];
+  idx = 0; userAnswers = []; score = 0;
+
+  document.getElementById('startScreen').classList.remove('active');
+  document.getElementById('progressWrap').style.display = 'block';
+  document.getElementById('quizWrap').style.display = 'block';
+  document.getElementById('navBar').style.display = 'flex';
+  document.getElementById('backBtn').classList.add('show');
+
+  loadQ();
+}
+
+// ── LOAD QUESTION ──
+function loadQ() {
+  const q = activeData[idx];
+  document.getElementById('qNum').textContent = `Question ${idx+1} of ${activeData.length}`;
+  document.getElementById('qText').textContent = q.q;
+
+  const choicesEl = document.getElementById('choices');
+  choicesEl.innerHTML = '';
+  const fbEl = document.getElementById('feedback');
+  fbEl.className = 'feedback';
+  fbEl.textContent = '';
+
+  q.choices.forEach((c, i) => {
+    const div = document.createElement('div');
+    div.className = 'choice';
+    div.innerHTML = `<div class="choice-ltr">${LETTERS[i]}</div><span>${c}</span>`;
+
+    if (userAnswers[idx]) {
+      div.classList.add('disabled');
+      if (LETTERS[i] === q.answer) div.classList.add('correct');
+      if (LETTERS[i] === userAnswers[idx] && userAnswers[idx] !== q.answer) div.classList.add('wrong');
+    } else {
+      div.onclick = () => selectAnswer(LETTERS[i]);
+    }
+    choicesEl.appendChild(div);
+  });
+
+  if (userAnswers[idx]) showFeedback(userAnswers[idx] === q.answer, q.answer);
+
+  updateProgress();
+  updateBtns();
+}
+
+function selectAnswer(letter) {
+  const q = activeData[idx];
+  userAnswers[idx] = letter;
+
+  const choices = document.querySelectorAll('.choice');
+  choices.forEach(c => { c.classList.add('disabled'); c.onclick = null; });
+
+  choices[LETTERS.indexOf(letter)].classList.add(letter === q.answer ? 'correct' : 'wrong');
+  if (letter !== q.answer) choices[LETTERS.indexOf(q.answer)].classList.add('correct');
+
+  if (letter === q.answer) score++;
+  showFeedback(letter === q.answer, q.answer);
+  updateProgress();
+  updateBtns();
+}
+
+function showFeedback(correct, ans) {
+  const fbEl = document.getElementById('feedback');
+  fbEl.className = `feedback show ${correct ? 'correct' : 'wrong'}`;
+  fbEl.textContent = correct ? '✅ Correct! Great job!' : `❌ Wrong! The correct answer is ${ans}.`;
+}
+
+function updateProgress() {
+  const pct = ((idx+1)/activeData.length)*100;
+  document.getElementById('progressFill').style.width = pct + '%';
+  document.getElementById('qCurrent').textContent = idx+1;
+  document.getElementById('qTotal').textContent = activeData.length;
+  document.getElementById('scoreDisplay').textContent = score;
+  document.getElementById('answeredDisplay').textContent = userAnswers.filter(Boolean).length;
+}
+
+function updateBtns() {
+  const prevBtn = document.getElementById('prevBtn');
+  const nextBtn = document.getElementById('nextBtn');
+  prevBtn.disabled = idx === 0;
+  const answered = !!userAnswers[idx];
+  if (idx === activeData.length-1) {
+    const unanswered = activeData.length - userAnswers.filter(Boolean).length;
+    nextBtn.textContent = unanswered > 0 ? `Finish (${unanswered} left)` : 'Finish ✓';
+    nextBtn.disabled = !answered;
+  } else {
+    nextBtn.textContent = 'Next →';
+    nextBtn.disabled = !answered;
+  }
+}
+
+function prevQ() { if (idx>0) { idx--; loadQ(); } }
+
+function nextQ() {
+  if (!userAnswers[idx]) return;
+  if (idx < activeData.length-1) { idx++; loadQ(); }
+  else {
+    const unanswered = activeData.length - userAnswers.filter(Boolean).length;
+    if (unanswered > 0) { showUnansweredModal(unanswered); return; }
+    showResults();
+  }
+}
+
+// ── UNANSWERED ──
+function showUnansweredModal(count) {
+  document.getElementById('unansweredMsg').textContent = `You have ${count} unanswered question${count>1?'s':''}. Please answer all before finishing.`;
+  const nums = activeData.map((_,i) => !userAnswers[i] ? i+1 : null).filter(Boolean);
+  document.getElementById('unansweredList').innerHTML = `<strong>Unanswered:</strong> ${nums.join(', ')}`;
+  document.getElementById('unansweredModal').classList.add('active');
+}
+
+// ── RESULTS ──
+function showResults() {
+  document.getElementById('quizWrap').style.display = 'none';
+  document.getElementById('navBar').style.display = 'none';
+  document.getElementById('backBtn').classList.remove('show');
+  document.getElementById('resultScreen').classList.add('active');
+
+  const total = activeData.length;
+  const pct = ((score/total)*100).toFixed(1);
+  document.getElementById('resultScore').textContent = `${score}/${total}`;
+  document.getElementById('statTotal').textContent = total;
+  document.getElementById('statCorrect').textContent = score;
+  document.getElementById('statWrong').textContent = total - score;
+  document.getElementById('statPercent').textContent = pct + '%';
+
+  let msg, icon;
+  if (pct >= 80) { msg = 'Excellent! You aced it! 🌟'; icon = '🏆'; }
+  else if (pct >= 60) { msg = 'Good job! Keep it up! 👍'; icon = '🎉'; }
+  else if (pct >= 40) { msg = 'Not bad! Keep practicing! 💪'; icon = '📚'; }
+  else { msg = 'Keep studying! You\'ll get it! 💡'; icon = '📖'; }
+
+  document.getElementById('resultMsg').textContent = msg;
+  document.getElementById('resultIcon').textContent = icon;
+}
+
+// ── REVIEW ──
+function showReview() {
+  const body = document.getElementById('reviewBody');
+  body.innerHTML = '';
+  activeData.forEach((q, i) => {
+    const ua = userAnswers[i];
+    const correct = ua === q.answer;
+    const uaIdx = LETTERS.indexOf(ua);
+    const caIdx = LETTERS.indexOf(q.answer);
+    const uaText = uaIdx !== -1 ? q.choices[uaIdx] : 'Not answered';
+    const caText = q.choices[caIdx];
+    const div = document.createElement('div');
+    div.className = 'review-item';
+    div.innerHTML = `
+      <div class="review-q">Q${i+1}: ${q.q}</div>
+      <div class="review-a ${correct ? 'review-correct' : 'review-wrong'}">
+        Your answer: ${ua ? `${ua}. ${uaText}` : 'Not answered'}
+        ${!correct ? `<br><strong>✓ Correct: ${q.answer}. ${caText}</strong>` : ''}
+      </div>`;
+    body.appendChild(div);
+  });
+  document.getElementById('reviewModal').classList.add('active');
+}
+
+// ── RESET ──
+function showResetModal() { document.getElementById('resetModal').classList.add('active'); }
+function confirmReset() {
+  closeModal('resetModal');
+  idx = 0; userAnswers = []; score = 0;
+  loadQ();
+}
+
+// ── BACK ──
+function showBackModal() { document.getElementById('backModal').classList.add('active'); }
+function confirmBack() {
+  closeModal('backModal');
+  idx = 0; userAnswers = []; score = 0; subjectSelected = false; shuffleOn = false; activeData = [];
+  document.getElementById('quizWrap').style.display = 'none';
+  document.getElementById('navBar').style.display = 'none';
+  document.getElementById('progressWrap').style.display = 'none';
+  document.getElementById('backBtn').classList.remove('show');
+  document.getElementById('startScreen').classList.add('active');
+  document.getElementById('subjectCard').classList.remove('selected');
+  document.getElementById('shuffleToggle').style.display = 'none';
+  document.getElementById('startBtn').style.display = 'none';
+  document.getElementById('checkBox').textContent = '';
+  document.getElementById('shuffleToggle').classList.remove('selected');
+}
+
+// ── RESTART ──
+function restartQuiz() {
+  document.getElementById('resultScreen').classList.remove('active');
+  idx = 0; userAnswers = []; score = 0; subjectSelected = false; shuffleOn = false; activeData = [];
+  document.getElementById('progressWrap').style.display = 'none';
+  document.getElementById('startScreen').classList.add('active');
+  document.getElementById('subjectCard').classList.remove('selected');
+  document.getElementById('shuffleToggle').style.display = 'none';
+  document.getElementById('startBtn').style.display = 'none';
+  document.getElementById('checkBox').textContent = '';
+  document.getElementById('shuffleToggle').classList.remove('selected');
+}
+
+// ── INIT ──
+window.addEventListener('DOMContentLoaded', () => {
+  if (localStorage.getItem('theme') === 'dark') {
+    document.body.classList.add('dark');
+    document.getElementById('themeBtn').textContent = '☀️';
+  }
+});
+</script>
+</body>
+</html>
